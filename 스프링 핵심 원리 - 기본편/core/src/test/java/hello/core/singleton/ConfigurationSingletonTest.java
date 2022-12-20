@@ -42,4 +42,13 @@ public class ConfigurationSingletonTest {
         assertThat(memberService.getMemberRepository()).isSameAs(memberRepository);
         assertThat(orderService.getMemberRepository()).isSameAs(memberRepository);
     }
+
+    @Test
+    void configurationDeep() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+        AppConfig bean = ac.getBean(AppConfig.class);
+
+        // AppConfig.class가 아닌 바이트 코드가 조작된 클래스가 빈으로 등록된 것을 확인할 수 있음.
+        System.out.println("bean = " + bean.getClass());
+    }
 }

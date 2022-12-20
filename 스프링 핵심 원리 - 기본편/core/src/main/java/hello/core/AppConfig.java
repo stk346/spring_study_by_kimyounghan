@@ -16,7 +16,7 @@ public class AppConfig {
 
     // @Bean -> memberService -> new MemoryMemberRepository()
     // @Bean -> orderService -> new MemoryMemberRepository()
-    // 이렇게 되면 각각의 객체가 생성되면서 싱글톤이 깨지는 것처럼 보인다.
+    // 이렇게 되면 각각의 객체가 생성되면서 싱글톤이 깨지는 것처럼 보인다. 
 
     @Bean
     public MemberService memberService() {

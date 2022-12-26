@@ -1,5 +1,6 @@
 package hello.springmvc.basic.requestmapping;
 
+import hello.springmvc.basic.HelloData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -74,7 +75,7 @@ public class MappingController {
     }
 
     /**
-     *특정 헤더로 추가 매핑
+     * 특정 헤더로 추가 매핑
      * headers="mode",
      * headers="!mode"
      * headers="mode=debug"

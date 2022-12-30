@@ -1,5 +1,6 @@
 package hello.itemservice;
 
+import hello.itemservice.domain.item.ItemType;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -9,5 +10,4 @@ class ItemServiceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

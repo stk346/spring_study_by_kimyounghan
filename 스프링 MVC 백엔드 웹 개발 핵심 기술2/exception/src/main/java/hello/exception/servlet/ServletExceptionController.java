@@ -13,7 +13,7 @@ public class ServletExceptionController {
 
     @GetMapping("/error-ex")
     public void errorEx() {
-        throw new RuntimeException("예외 발생!");
+        throw  new RuntimeException("예외 발생!");
     }
 
     @GetMapping("/error-404")

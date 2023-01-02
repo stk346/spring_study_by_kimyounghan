@@ -22,7 +22,7 @@ public class ServletExceptionController {
     }
 
     @GetMapping("/error-400")
-    public void error400(HttpServletResponse response) throws IOException {
+    public void error400 (HttpServletResponse response) throws IOException {
         response.sendError(400, "400오류!");
     }
 

@@ -1,6 +1,5 @@
 package jpabook.jpashop.repository;
 
-import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.item.Item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -22,7 +21,7 @@ public class ItemRepository {
         }
     }
 
-    public Item findItem(Long id) {
+    public Item findOne(Long id) {
         return em.find(Item.class, id);
     }
 

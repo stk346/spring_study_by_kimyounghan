@@ -13,8 +13,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -28,17 +26,15 @@ import java.util.Optional;
 @Slf4j
 public class JdbcTemplateItemRepositoryV3 implements ItemRepository {
 
-//    private final JdbcTemplate template;
     private final NamedParameterJdbcTemplate template;
     private final SimpleJdbcInsert jdbcInsert;
 
-    // 커넥션 등을 만들어야 하기 때문에 DataSource가 필요
     public JdbcTemplateItemRepositoryV3(DataSource dataSource) {
         this.template = new NamedParameterJdbcTemplate(dataSource);
         this.jdbcInsert = new SimpleJdbcInsert(dataSource)
                 .withTableName("item")
                 .usingGeneratedKeyColumns("id");
-//                .withTableName("item_name", "price", "quantity") // 생략 가능
+//                .usingColumns("item_name", "price", "quantity"); //생략 가능
     }
 
     @Override
@@ -60,6 +56,7 @@ public class JdbcTemplateItemRepositoryV3 implements ItemRepository {
                 .addValue("price", updateParam.getPrice())
                 .addValue("quantity", updateParam.getQuantity())
                 .addValue("id", itemId); //이 부분이 별도로 필요하다.
+
         template.update(sql, param);
     }
 
@@ -75,10 +72,6 @@ public class JdbcTemplateItemRepositoryV3 implements ItemRepository {
         }
     }
 
-    private RowMapper<Item> itemRowMapper() {
-        return BeanPropertyRowMapper.newInstance(Item.class); //camel 변환 지원
-    }
-
     @Override
     public List<Item> findAll(ItemSearchCond cond) {
         String itemName = cond.getItemName();
@@ -87,25 +80,29 @@ public class JdbcTemplateItemRepositoryV3 implements ItemRepository {
         SqlParameterSource param = new BeanPropertySqlParameterSource(cond);
 
         String sql = "select id, item_name, price, quantity from item";
-
         //동적 쿼리
         if (StringUtils.hasText(itemName) || maxPrice != null) {
             sql += " where";
         }
+
         boolean andFlag = false;
         if (StringUtils.hasText(itemName)) {
             sql += " item_name like concat('%',:itemName,'%')";
             andFlag = true;
         }
+
         if (maxPrice != null) {
             if (andFlag) {
                 sql += " and";
             }
             sql += " price <= :maxPrice";
         }
-        log.info("sql={}", sql);
 
+        log.info("sql={}", sql);
         return template.query(sql, param, itemRowMapper());
     }
 
+    private RowMapper<Item> itemRowMapper() {
+        return BeanPropertyRowMapper.newInstance(Item.class); //camel 변환 지원
+    }
 }

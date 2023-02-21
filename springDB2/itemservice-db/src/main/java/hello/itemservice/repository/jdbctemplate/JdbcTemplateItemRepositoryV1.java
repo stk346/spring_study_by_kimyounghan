@@ -26,18 +26,16 @@ public class JdbcTemplateItemRepositoryV1 implements ItemRepository {
 
     private final JdbcTemplate template;
 
-    // 커넥션 등을 만들어야 하기 때문에 DataSource가 필요
     public JdbcTemplateItemRepositoryV1(DataSource dataSource) {
         this.template = new JdbcTemplate(dataSource);
     }
 
     @Override
     public Item save(Item item) {
-        String sql = "insert into item (item_name, price, quantity) values (?, ?, ?)";
-
+        String sql = "insert into item(item_name, price, quantity) values (?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         template.update(connection -> {
-            // 자동 증가 키
+            //자동 증가 키
             PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setString(1, item.getItemName());
             ps.setInt(2, item.getPrice());
@@ -71,27 +69,17 @@ public class JdbcTemplateItemRepositoryV1 implements ItemRepository {
         }
     }
 
-    private RowMapper<Item> itemRowMapper() {
-        return ((rs, rowNum) -> {
-            Item item = new Item();
-            item.setId(rs.getLong("id"));
-            item.setItemName(rs.getString("item_name"));
-            item.setPrice(rs.getInt("price"));
-            item.setPrice(rs.getInt("quantity"));
-            return item;
-        });
-    }
-
     @Override
     public List<Item> findAll(ItemSearchCond cond) {
         String itemName = cond.getItemName();
         Integer maxPrice = cond.getMaxPrice();
-        String sql = "select id, item_name, price, quantity from item";
 
+        String sql = "select id, item_name, price, quantity from item";
         //동적 쿼리
         if (StringUtils.hasText(itemName) || maxPrice != null) {
             sql += " where";
         }
+
         boolean andFlag = false;
         List<Object> param = new ArrayList<>();
         if (StringUtils.hasText(itemName)) {
@@ -99,6 +87,7 @@ public class JdbcTemplateItemRepositoryV1 implements ItemRepository {
             param.add(itemName);
             andFlag = true;
         }
+
         if (maxPrice != null) {
             if (andFlag) {
                 sql += " and";
@@ -106,9 +95,19 @@ public class JdbcTemplateItemRepositoryV1 implements ItemRepository {
             sql += " price <= ?";
             param.add(maxPrice);
         }
-        log.info("sql={}", sql);
 
+        log.info("sql={}", sql);
         return template.query(sql, itemRowMapper(), param.toArray());
     }
 
+    private RowMapper<Item> itemRowMapper() {
+        return ((rs, rowNum) -> {
+            Item item = new Item();
+            item.setId(rs.getLong("id"));
+            item.setItemName(rs.getString("item_name"));
+            item.setPrice(rs.getInt("price"));
+            item.setQuantity(rs.getInt("quantity"));
+            return item;
+        });
+    }
 }

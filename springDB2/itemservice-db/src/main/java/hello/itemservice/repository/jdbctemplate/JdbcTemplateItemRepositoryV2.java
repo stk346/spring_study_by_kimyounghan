@@ -7,7 +7,6 @@ import hello.itemservice.repository.ItemUpdateDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,30 +17,32 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * namedParameterJdbcTemplate
- * 파라미터를 순서대로 바인딩하지 않고 네이밍을 붙여 바인딩한다.
+ * NamedParameterJdbcTemplate
+ * SqlParameterSource
+ * - BeanPropertySqlParameterSource
+ * - MapSqlParameterSource
+ * Map
+ *
+ * BeanPropertyRowMapper
+ *
  */
 @Slf4j
 public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
 
-//    private final JdbcTemplate template;
     private final NamedParameterJdbcTemplate template;
 
-    // 커넥션 등을 만들어야 하기 때문에 DataSource가 필요
     public JdbcTemplateItemRepositoryV2(DataSource dataSource) {
         this.template = new NamedParameterJdbcTemplate(dataSource);
     }
 
     @Override
     public Item save(Item item) {
-        String sql = "insert into item (item_name, price, quantity) " +
+        String sql = "insert into item(item_name, price, quantity) " +
                 "values (:itemName, :price, :quantity)";
 
         SqlParameterSource param = new BeanPropertySqlParameterSource(item);
@@ -49,7 +50,7 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         template.update(sql, param, keyHolder);
 
-        Long key = keyHolder.getKey().longValue();
+        long key = keyHolder.getKey().longValue();
         item.setId(key);
         return item;
     }
@@ -65,6 +66,7 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
                 .addValue("price", updateParam.getPrice())
                 .addValue("quantity", updateParam.getQuantity())
                 .addValue("id", itemId); //이 부분이 별도로 필요하다.
+
         template.update(sql, param);
     }
 
@@ -80,10 +82,6 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
         }
     }
 
-    private RowMapper<Item> itemRowMapper() {
-        return BeanPropertyRowMapper.newInstance(Item.class); //camel 변환 지원
-    }
-
     @Override
     public List<Item> findAll(ItemSearchCond cond) {
         String itemName = cond.getItemName();
@@ -92,25 +90,29 @@ public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
         SqlParameterSource param = new BeanPropertySqlParameterSource(cond);
 
         String sql = "select id, item_name, price, quantity from item";
-
         //동적 쿼리
         if (StringUtils.hasText(itemName) || maxPrice != null) {
             sql += " where";
         }
+
         boolean andFlag = false;
         if (StringUtils.hasText(itemName)) {
             sql += " item_name like concat('%',:itemName,'%')";
             andFlag = true;
         }
+
         if (maxPrice != null) {
             if (andFlag) {
                 sql += " and";
             }
             sql += " price <= :maxPrice";
         }
-        log.info("sql={}", sql);
 
+        log.info("sql={}", sql);
         return template.query(sql, param, itemRowMapper());
     }
 
+    private RowMapper<Item> itemRowMapper() {
+        return BeanPropertyRowMapper.newInstance(Item.class); //camel 변환 지원
+    }
 }

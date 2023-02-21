@@ -12,18 +12,18 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-                       public class ItemServiceV1 implements ItemService {
+    public class ItemServiceV1 implements ItemService {
 
-        private final ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
-        @Override
-        public Item save(Item item) {
-            return itemRepository.save(item);
-        }
+    @Override
+    public Item save(Item item) {
+        return itemRepository.save(item);
+    }
 
-        @Override
-        public void update(Long itemId, ItemUpdateDto updateParam) {
-        itemRepository.update(itemId, updateParam);
+    @Override
+    public void update(Long itemId, ItemUpdateDto updateParam) {
+    itemRepository.update(itemId, updateParam);
     }
 
     @Override

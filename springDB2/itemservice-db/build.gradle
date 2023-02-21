@@ -8,6 +8,9 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+// find~~ 메서드 관련해서 버그 발생. 하이버네이트 5.6.7 -> 5.6.6 이하 버전으로 다운그래이드
+ext["hibernate.version"] = "5.6.5.Final"
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor

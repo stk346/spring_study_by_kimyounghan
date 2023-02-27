@@ -1,8 +1,7 @@
 spring:
   # 테스트 케이스에 영향을 받지 않는 예제 케이스 추가용 설정 시작
-  ## active를 local로 설정했기 때문에 application을 실행할 때 @profile("local") 애노테이션이 붙어 있는 것이 실행됨
   profiles:
-    active: local
+    active: test
   # 테스트 케이스에 영향을 받지 않는 예제 케이스 추가용 설정 끝
 
 

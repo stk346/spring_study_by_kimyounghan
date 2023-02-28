@@ -1,6 +1,5 @@
 package hello.proxy.app.v2;
 
-import hello.proxy.app.v1.OrderServiceV1;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,7 @@ public class OrderControllerV2 {
 
     @GetMapping("/v2/request")
     public String request(String itemId) {
-        orderService.orderITem(itemId);
+        orderService.orderItem(itemId);
         return "ok";
     }
 
